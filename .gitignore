@@ -1,0 +1,45 @@
+# Secrets / credentials
+master.key
+*.key
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+
+# Local encrypted/private data
+memory/*.json
+memory/*.enc
+memory/*.db
+memory/data/
+sessions/sessions.json
+sessions/*.tmp
+
+# Runtime logs / process files
+*.log
+*.pid
+api/*.log
+ui/*.log
+
+# Local temporary files
+*.tmp
+*.bak
+*~
+/tmp/
+
+# Local model files (large/private)
+*.gguf
+*.bin
+models/*.gguf
+models/*.bin
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Termux / editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
