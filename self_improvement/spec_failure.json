@@ -1,0 +1,9 @@
+{
+  "matched": false,
+  "messages": [
+    "Missing required function: check_knowledge()",
+    "Missing required function: check_llm()",
+    "Missing required function: check_web()",
+    "Missing required function: get_system_status()"
+  ]
+}

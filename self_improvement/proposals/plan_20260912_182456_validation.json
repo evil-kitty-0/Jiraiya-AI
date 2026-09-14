@@ -1,0 +1,52 @@
+{
+  "plan_file": "/data/data/com.termux/files/home/jiraiya/self_improvement/proposals/plan_20260912_182456.json",
+  "status": "REVISE",
+  "severity": "HIGH",
+  "request": "Add a system status command that reports whether Jiraiya's memory, knowledge, web and LLM components are healthy.",
+  "architecture_check": {
+    "existing_files": [],
+    "new_files": [
+      {
+        "path": "self_improvement/system_status.py",
+        "status": "NEW",
+        "reason": "New source file."
+      },
+      {
+        "path": "self_improvement/system_status_test.py",
+        "status": "NEW",
+        "reason": "New source file."
+      }
+    ],
+    "blocked": [],
+    "wrong_existing": [],
+    "wrong_new": []
+  },
+  "semantic_problems": [],
+  "sandbox_validation": [
+    {
+      "path": "/data/data/com.termux/files/home/jiraiya/self_improvement/sandbox/improvement_20260912_193544/self_improvement/system_status.py",
+      "status": "PASS",
+      "reason": "Python syntax is valid."
+    },
+    {
+      "path": "/data/data/com.termux/files/home/jiraiya/self_improvement/sandbox/improvement_20260912_193544/self_improvement/system_status.py",
+      "status": "PASS",
+      "reason": "No obvious undefined names detected."
+    },
+    {
+      "path": "/data/data/com.termux/files/home/jiraiya/self_improvement/sandbox/improvement_20260912_193544/self_improvement/system_status_test.py",
+      "status": "PASS",
+      "reason": "Python syntax is valid."
+    },
+    {
+      "path": "/data/data/com.termux/files/home/jiraiya/self_improvement/sandbox/improvement_20260912_193544/self_improvement/system_status_test.py",
+      "status": "FAIL",
+      "reason": "Possible undefined names: BASE_DIR"
+    },
+    {
+      "path": "/data/data/com.termux/files/home/jiraiya/self_improvement/sandbox/improvement_20260912_193544/self_improvement/system_status_test.py",
+      "status": "FAIL",
+      "reason": "No test_* function found. No executable __main__ entry point. Test does not appear to import the generated implementation."
+    }
+  ]
+}

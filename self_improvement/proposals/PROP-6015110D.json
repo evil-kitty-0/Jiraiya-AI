@@ -1,0 +1,19 @@
+{
+  "id": "PROP-6015110D",
+  "title": "Sandbox self-test feature",
+  "description": "Add a harmless internal self-test that checks whether the Jiraiya sandbox is functioning.",
+  "changes": [
+    "Add a sandbox self-test module",
+    "Record test result in the self-improvement log"
+  ],
+  "tests": [
+    "Python syntax check",
+    "Sandbox import test",
+    "Self-test execution"
+  ],
+  "risk": "LOW",
+  "status": "APPROVED",
+  "created_at": "2026-09-12T16:59:13.987365+05:30",
+  "approved_at": "2026-09-12T16:59:56.888885+05:30",
+  "rejected_at": null
+}

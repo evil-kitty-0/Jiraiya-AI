@@ -1,0 +1,6 @@
+{
+  "chunk_id": "nested_test_repair",
+  "target_file": "self_improvement/test_module.py",
+  "operation": "MODIFY_FUNCTION",
+  "code": "def test_create_file():\n    import system_status\n    result = system_status.get_system_status()\n    assert type(result) is dict\n    assert \"memory\" in result\n    assert \"knowledge\" in result\n    assert \"web\" in result\n    assert \"llm\" in result"
+}

@@ -1,0 +1,56 @@
+{
+  "created_at": "2026-09-12T18:24:56+05:30",
+  "request": "Add a system status command that reports whether Jiraiya's memory, knowledge, web and LLM components are healthy.",
+  "revision": 1,
+  "plan": {
+    "title": "Add System Status Command",
+    "goal": "Provide one controlled command that reports the health of Jiraiya's memory, knowledge, web and local LLM components.",
+    "reason": "A centralized diagnostic command will make it easier to detect component failures before they affect normal operation.",
+    "existing_files": [],
+    "new_files": [
+      "self_improvement/system_status.py",
+      "self_improvement/system_status_test.py"
+    ],
+    "related_files": [
+      "memory/memory.py",
+      "knowledge/knowledge.py",
+      "web/web.py",
+      "model_manager.py"
+    ],
+    "changes": [
+      {
+        "file": "self_improvement/system_status.py",
+        "action": "create",
+        "description": "Create a standalone read-only system health checker. Check memory by safely opening the encrypted memory store through the existing memory module, check knowledge by opening and querying the existing SQLite knowledge database, check web by performing a lightweight HTTPS request through the existing web functionality, and check the local LLM by calling the existing llama-server health endpoint.",
+        "constraints": [
+          "Do not modify existing production modules.",
+          "Do not modify memory data.",
+          "Do not modify knowledge data.",
+          "Do not expose encryption keys or secrets.",
+          "Do not execute arbitrary shell commands.",
+          "Use short timeouts for external checks.",
+          "Return structured JSON and human-readable output.",
+          "Exit successfully only when the diagnostic itself runs correctly."
+        ]
+      },
+      {
+        "file": "self_improvement/system_status_test.py",
+        "action": "create",
+        "description": "Create tests for the standalone system status checker. Test output structure, protected-file safety, component check handling, and graceful failure when a dependency is unavailable.",
+        "constraints": [
+          "Tests must not modify production databases.",
+          "Tests must not modify encryption keys.",
+          "Tests must not execute arbitrary generated commands."
+        ]
+      }
+    ],
+    "tests": [
+      "python -m py_compile self_improvement/system_status.py",
+      "python -m py_compile self_improvement/system_status_test.py",
+      "python self_improvement/system_status_test.py",
+      "python self_improvement/system_status.py"
+    ],
+    "risk": "LOW",
+    "rollback": "Create a production backup before deployment. Since this revision creates only new diagnostic files, rollback removes only the deployed files listed in this plan after confirming that the deployment matches the recorded implementation hashes. Never remove or restore unrelated files."
+  }
+}

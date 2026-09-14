@@ -1,0 +1,29 @@
+{
+  "repair_count": 4,
+  "repairs": [
+    {
+      "chunk_id": "repair_check_knowledge",
+      "target_file": "self_improvement/system_status.py",
+      "operation": "ADD_FUNCTION",
+      "goal": "Add the required function check_knowledge. It must be a safe, read-only system status check and return a simple result."
+    },
+    {
+      "chunk_id": "repair_check_llm",
+      "target_file": "self_improvement/system_status.py",
+      "operation": "ADD_FUNCTION",
+      "goal": "Add the required function check_llm. It must be a safe, read-only system status check and return a simple result."
+    },
+    {
+      "chunk_id": "repair_check_web",
+      "target_file": "self_improvement/system_status.py",
+      "operation": "ADD_FUNCTION",
+      "goal": "Add the required function check_web. It must be a safe, read-only system status check and return a simple result."
+    },
+    {
+      "chunk_id": "repair_get_system_status",
+      "target_file": "self_improvement/system_status.py",
+      "operation": "ADD_FUNCTION",
+      "goal": "Add the required function get_system_status. It must be a safe, read-only system status check and return a simple result."
+    }
+  ]
+}

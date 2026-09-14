@@ -1,0 +1,30 @@
+{
+  "valid": true,
+  "severity": "MEDIUM",
+  "request": "Add a system status command that reports whether Jiraiya's memory, knowledge, web and LLM components are healthy.",
+  "files": [
+    {
+      "status": "NEW",
+      "path": "components.py",
+      "reason": "File does not currently exist",
+      "file": "components.py"
+    },
+    {
+      "status": "NEW",
+      "path": "jiraiya.py",
+      "reason": "File does not currently exist",
+      "file": "jiraiya.py"
+    },
+    {
+      "status": "NEW",
+      "path": "status.py",
+      "reason": "File does not currently exist",
+      "file": "status.py"
+    }
+  ],
+  "existing_count": 0,
+  "new_count": 3,
+  "blocked_count": 0,
+  "architecture": "/data/data/com.termux/files/home/jiraiya/self_improvement/architecture.json",
+  "validated_at": "2026-09-12T17:11:39.870667+05:30"
+}
