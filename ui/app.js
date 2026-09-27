@@ -169,12 +169,32 @@ async function approveCyberAuthorization() {
     if (!pendingCyberFinding || !pendingCyberFinding.authorization) return;
     try {
         await cyberRequest("/api/cyber/authorization/" + encodeURIComponent(pendingCyberFinding.authorization.id) + "/approve", {method:"POST", body:"{}"});
-        cyberAuthModal.classList.remove("open");
-        alert("Authorization approved. Any future PoC executor must consume this exact authorization before execution.");
+        cyberModalApprove.style.display = "none";
+        cyberModalExecute.style.display = "inline-block";
+        alert("Authorization approved. The next button runs one bounded GET verification against the exact authorized target.");
     } catch (error) { alert("Approval failed: " + error.message); }
 }
 
-function closeCyberAuthorization() { pendingCyberFinding = null; cyberAuthModal.classList.remove("open"); }
+async function executeCyberAuthorization() {
+    if (!pendingCyberFinding || !pendingCyberFinding.authorization) return;
+    try {
+        const auth = pendingCyberFinding.authorization;
+        const result = await cyberRequest("/api/cyber/authorization/" + encodeURIComponent(auth.id) + "/consume", {
+            method:"POST",
+            body:JSON.stringify({finding_id: pendingCyberFinding.id, action:"controlled_non_destructive_poc"})
+        });
+        cyberAuthModal.classList.remove("open");
+        await loadCyberFindings();
+        alert("Authorized check completed. Signals: " + ((result.result && result.result.confirmed_signals) || []).join(", ") || "none");
+    } catch (error) { alert("Authorized check failed: " + error.message); }
+}
+
+function closeCyberAuthorization() {
+    pendingCyberFinding = null;
+    cyberModalApprove.style.display = "inline-block";
+    cyberModalExecute.style.display = "none";
+    cyberAuthModal.classList.remove("open");
+}
 
 /* ============================================================
    SESSION API
