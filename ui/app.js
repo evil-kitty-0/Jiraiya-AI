@@ -135,6 +135,20 @@ function renderCyberFinding(finding) {
         btn.textContent = "Request PoC authorization";
         btn.onclick = function(){ openCyberAuthorization(finding); };
         actions.appendChild(btn);
+        const reportBtn = document.createElement("button");
+        reportBtn.className = "cyber-secondary";
+        reportBtn.textContent = "Generate report";
+        reportBtn.onclick = async function(){
+            try {
+                const data = await cyberRequest("/api/cyber/report/" + encodeURIComponent(finding.id), {method:"POST", body:JSON.stringify({})});
+                const blob = new Blob([JSON.stringify(data.report, null, 2)], {type:"application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = finding.id + "-report.json"; a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) { alert("Report generation failed: " + error.message); }
+        };
+        actions.appendChild(reportBtn);
     }
     card.appendChild(title); card.appendChild(meta); card.appendChild(actions); box.appendChild(card);
 }
