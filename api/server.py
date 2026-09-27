@@ -355,6 +355,16 @@ class JiraiyaHandler(BaseHTTPRequestHandler):
             if path == "/api/cyber/scope":
                 self._send_json({"ok": True, "scope": cyber_service.set_scope(data)})
                 return True
+            if path == "/api/cyber/recon":
+                urls = data.get("urls", [])
+                if not isinstance(urls, list):
+                    raise ValueError("urls must be a list")
+                self._send_json({"ok": True, **cyber_service.recon([str(x) for x in urls], int(data.get("max_requests", 5)))})
+                return True
+            if path.startswith("/api/cyber/report/"):
+                finding_id = path.rsplit("/", 1)[-1]
+                self._send_json({"ok": True, "report": cyber_service.report(finding_id, str(data.get("impact", "")), str(data.get("remediation", "")))})
+                return True
             if path == "/api/cyber/finding":
                 self._send_json({"ok": True, "finding": cyber_service.create_finding(data)})
                 return True
