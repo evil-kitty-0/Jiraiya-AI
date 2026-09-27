@@ -9,6 +9,8 @@ from .authorization import AuthorizationError, AuthorizationManager
 from .findings import Finding
 from .scope import Scope, ScopeError
 from .verifier import propose_verification
+from .recon import run_recon, header_findings
+from .reporter import build_report
 
 
 class CyberService:
@@ -70,6 +72,24 @@ class CyberService:
             "authorization": record.as_dict(),
             "message": "Authorization consumed. No PoC executor is attached in this foundation build.",
         }
+
+    def recon(self, urls: list[str], max_requests: int = 5) -> dict:
+        if self.scope is None:
+            raise ScopeError("configure an explicit cyber scope first")
+        results = run_recon(self.scope, urls, max_requests)
+        created = []
+        for result in results:
+            for candidate in header_findings(result):
+                finding = Finding(**candidate)
+                finding.request_verification()
+                finding.evidence.append({"type": "recon", "data": result})
+                self.findings[finding.id] = finding
+                created.append(finding.as_dict())
+        return {"results": results, "findings": created}
+
+    def report(self, finding_id: str, impact: str = "", remediation: str = "") -> dict:
+        finding = self._finding(finding_id)
+        return build_report(finding, impact, remediation)
 
     def list_findings(self) -> list[dict]:
         return [finding.as_dict() for finding in self.findings.values()]
