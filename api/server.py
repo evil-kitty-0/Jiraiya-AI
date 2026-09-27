@@ -431,8 +431,6 @@ class JiraiyaHandler(BaseHTTPRequestHandler):
 
         if self.path == "/api/chat":
 
-            data = self._read_json()
-
             message = str(
                 data.get(
                     "message",
