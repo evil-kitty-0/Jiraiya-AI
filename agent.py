@@ -88,6 +88,43 @@ except Exception as e:
 
 
 # ============================================================
+# CYBER FOUNDATION
+# ============================================================
+
+try:
+    from cyber.service import service as cyber_service
+    CYBER_IMPORT_ERROR = None
+except Exception as e:
+    cyber_service = None
+    CYBER_IMPORT_ERROR = repr(e)
+
+
+def is_cyber_intent(text):
+    lower = text.lower()
+    words = [
+        "bug bounty", "vulnerability", "security test", "security assessment",
+        "pentest", "pen test", "cyber", "xss", "ssrf", "idor", "injection",
+        "security finding", "bug report", "bug bounty report",
+    ]
+    return any(word in lower for word in words)
+
+
+def cyber_status():
+    if cyber_service is None:
+        return "🔐 Cyber module unavailable."
+    scope = cyber_service.scope
+    findings = cyber_service.list_findings()
+    if scope is None:
+        return "🛡️ Jiraiya-Cyber is ready. No target scope is configured yet."
+    return (
+        f"🛡️ Cyber scope: {scope.program} | "
+        f"Allowed hosts: {', '.join(scope.allowed_hosts)} | "
+        f"Findings: {len(findings)} | "
+        "Active PoC execution remains authorization-gated."
+    )
+
+
+# ============================================================
 # PID MANAGEMENT
 # ============================================================
 
@@ -798,6 +835,19 @@ def format_gold_result(data):
 # INTENT DETECTION
 # ============================================================
 
+def cyber_assistant_answer(text):
+    status = cyber_status()
+    prompt = (
+        "You are Jiraiya-Cyber, an authorization-first security assistant. "
+        "Help with defensive security assessment, scope definition, finding analysis, "
+        "evidence handling, and bug-bounty reporting. Never claim that a target was tested "
+        "unless an actual authorized tool result is supplied. Active PoC actions require "
+        "explicit authorization for the exact finding, target, and action.\\n\\n"
+        f"Current cyber status: {status}\\n\\nUser request:\\n{text}"
+    )
+    return str(ask_model(prompt, system_prompt="You are Jiraiya-Cyber. Follow authorization boundaries exactly.", max_tokens=500) or "")
+
+
 def is_memory_intent(text):
 
     lower = text.lower()
@@ -1113,6 +1163,13 @@ def route_user_message(text):
 
     if not clean:
         return ""
+
+    # --------------------------------------------------------
+    # CYBER
+    # --------------------------------------------------------
+
+    if is_cyber_intent(clean):
+        return cyber_assistant_answer(clean)
 
     # --------------------------------------------------------
     # DIRECT MEMORY

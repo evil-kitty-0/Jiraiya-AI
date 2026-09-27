@@ -54,6 +54,34 @@
                 <button class="settings-btn" title="Settings">⚙</button>
             </header>
 
+            <!-- Cyber Security Panel -->
+            <section class="cyber-panel" id="cyberPanel" aria-label="Jiraiya Cyber">
+                <div class="cyber-panel-header">
+                    <div>
+                        <strong>🛡️ JIRAIYA CYBER</strong>
+                        <span>Authorization-first security testing</span>
+                    </div>
+                    <button id="cyberCloseBtn" class="cyber-close" title="Close">×</button>
+                </div>
+
+                <div class="cyber-scope-card">
+                    <h3>Authorized scope</h3>
+                    <input id="cyberProgram" placeholder="Program name">
+                    <input id="cyberHosts" placeholder="Allowed hosts (comma separated)">
+                    <input id="cyberPaths" placeholder="Allowed paths, e.g. /api/*,/app/*">
+                    <button id="cyberScopeBtn" class="cyber-primary">Save scope</button>
+                    <button id="cyberReconBtn" class="cyber-secondary" style="width:100%;margin-top:7px;">Run scoped recon</button>
+                    <input id="cyberReconUrls" placeholder="Authorized URLs (comma separated)">
+                    <div id="cyberScopeStatus" class="cyber-status-text">No scope configured.</div>
+                </div>
+
+                <div class="cyber-findings-head">
+                    <h3>Findings</h3>
+                    <button id="cyberRefreshBtn" class="cyber-secondary">Refresh</button>
+                </div>
+                <div id="cyberFindings" class="cyber-findings"></div>
+            </section>
+
             <!-- Chat -->
             <section class="chat-area" id="chatArea">
 
@@ -111,6 +139,20 @@
 
         </main>
 
+    </div>
+
+    <div class="cyber-modal" id="cyberAuthModal" role="dialog" aria-modal="true">
+        <div class="cyber-modal-card">
+            <h2>🔐 Authorize controlled PoC</h2>
+            <p><strong>Finding:</strong> <span id="cyberModalTitle"></span></p>
+            <p><strong>Target:</strong> <span id="cyberModalTarget"></span></p>
+            <p><strong>Action:</strong> <span id="cyberModalAction"></span></p>
+            <p>This approval is scoped to this exact finding, target and action. It expires automatically and is single-use by default.</p>
+            <div class="cyber-modal-actions">
+                <button id="cyberModalCancel" class="cyber-cancel">Cancel</button>
+                <button id="cyberModalApprove" class="cyber-approve">AUTHORIZE</button><button id="cyberModalExecute" class="cyber-primary" style="display:none;">RUN AUTHORIZED CHECK</button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
