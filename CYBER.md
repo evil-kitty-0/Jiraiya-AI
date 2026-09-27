@@ -38,3 +38,15 @@ No authorization for one finding should grant permission for another finding or 
 - `GET /api/cyber/authorization/<id>` — inspect authorization state.
 
 The API is bound to Jiraiya's existing localhost service. Future active tools must call the authorization consume path immediately before execution and stop when the authorization is exhausted or expired.
+
+## Scoped recon
+
+`POST /api/cyber/recon` accepts only caller-supplied URLs and checks every URL against the configured scope. The current recon layer is deliberately conservative: at most five ordinary GET requests per call, a short timeout, no attack payloads, and no redirect following. It records response metadata and can create candidate security-header findings.
+
+## Reporting
+
+`POST /api/cyber/report/<finding_id>` generates a structured report from the finding and its evidence. Severity remains explicitly unset until a human or a later evidence-based classifier assigns it.
+
+## Safety boundary
+
+The project does not include an unrestricted command runner or autonomous exploitation loop. Any future active PoC executor must require an approved, matching authorization immediately before execution and must enforce the authorization's target, action, attempt limit, and expiry.
