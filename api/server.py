@@ -371,6 +371,10 @@ class JiraiyaHandler(BaseHTTPRequestHandler):
                     int(data.get("expires_in_seconds", 300)),
                 )})
                 return True
+            if path.startswith("/api/cyber/authorization/") and path.endswith("/approve"):
+                auth_id = path.split("/api/cyber/authorization/", 1)[1].rsplit("/approve", 1)[0]
+                self._send_json({"ok": True, "authorization": cyber_service.authorization.authorize(auth_id).as_dict()})
+                return True
             if path.startswith("/api/cyber/authorization/") and path.endswith("/consume"):
                 auth_id = path.split("/api/cyber/authorization/", 1)[1].rsplit("/consume", 1)[0]
                 self._send_json({"ok": True, **cyber_service.consume_authorization(
