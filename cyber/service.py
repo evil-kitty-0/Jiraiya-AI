@@ -72,6 +72,8 @@ class CyberService:
             raise AuthorizationError("authorization not found")
         if record.action != action:
             raise AuthorizationError("authorization action mismatch")
+        if not record.active():
+            raise AuthorizationError("authorization is not active")
         result = execute_authorized_get(finding, record)
         if result.get("confirmed_signals"):
             finding.mark_verified()
