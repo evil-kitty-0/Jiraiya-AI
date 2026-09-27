@@ -24,9 +24,10 @@ class Authorization:
     created_at: float = field(default_factory=time)
     attempts: int = 0
     used: bool = False
+    approved: bool = False
 
     def active(self) -> bool:
-        return (not self.used and self.attempts < self.max_attempts and
+        return (self.approved and not self.used and self.attempts < self.max_attempts and
                 time() < self.created_at + self.expires_in_seconds)
 
     def consume(self) -> None:
@@ -59,6 +60,11 @@ class AuthorizationManager:
         record = self._records.get(authorization_id)
         if record is None:
             raise AuthorizationError("authorization record not found")
+        if record.used:
+            raise AuthorizationError("authorization has already been consumed")
+        if time() >= record.created_at + record.expires_in_seconds:
+            raise AuthorizationError("authorization has expired")
+        record.approved = True
         return record
 
     def consume(self, authorization_id: str, finding_id: str, target: str, action: str) -> Authorization:
