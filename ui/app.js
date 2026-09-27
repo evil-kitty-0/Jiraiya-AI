@@ -185,7 +185,7 @@ async function executeCyberAuthorization() {
         });
         cyberAuthModal.classList.remove("open");
         await loadCyberFindings();
-        alert("Authorized check completed. Signals: " + ((result.result && result.result.confirmed_signals) || []).join(", ") || "none");
+        alert("Authorized check completed. Signals: " + ((((result.result && result.result.confirmed_signals) || []).join(", ")) || "none"));
     } catch (error) { alert("Authorized check failed: " + error.message); }
 }
 
