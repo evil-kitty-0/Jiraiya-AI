@@ -77,8 +77,6 @@ class CyberService:
         result = execute_authorized_get(finding, record)
         if result.get("confirmed_signals"):
             finding.mark_verified()
-        else:
-            finding.reject()
         finding.evidence.append({"type": "authorized_verification", "data": result})
         return {
             "authorized": True,
