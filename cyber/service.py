@@ -11,6 +11,7 @@ from .scope import Scope, ScopeError
 from .verifier import propose_verification
 from .recon import run_recon, header_findings
 from .reporter import build_report
+from .executor import execute_authorized_get
 
 
 class CyberService:
@@ -66,11 +67,22 @@ class CyberService:
 
     def consume_authorization(self, authorization_id: str, finding_id: str, action: str) -> dict:
         finding = self._finding(finding_id)
-        record = self.authorization.consume(authorization_id, finding.id, finding.target, action)
+        record = self.authorization.get(authorization_id)
+        if record is None:
+            raise AuthorizationError("authorization not found")
+        if record.action != action:
+            raise AuthorizationError("authorization action mismatch")
+        result = execute_authorized_get(finding, record)
+        if result.get("confirmed_signals"):
+            finding.mark_verified()
+        else:
+            finding.reject()
+        finding.evidence.append({"type": "authorized_verification", "data": result})
         return {
             "authorized": True,
             "authorization": record.as_dict(),
-            "message": "Authorization consumed. No PoC executor is attached in this foundation build.",
+            "result": result,
+            "finding": finding.as_dict(),
         }
 
     def recon(self, urls: list[str], max_requests: int = 5) -> dict:
