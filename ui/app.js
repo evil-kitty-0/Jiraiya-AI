@@ -92,6 +92,17 @@ async function saveCyberScope() {
     } catch (error) { status.textContent = "❌ " + error.message; }
 }
 
+async function runCyberRecon() {
+    const raw = document.getElementById("cyberReconUrls").value;
+    const urls = raw.split(",").map(function(x){return x.trim();}).filter(Boolean);
+    if (!urls.length) { alert("Enter at least one authorized URL."); return; }
+    try {
+        const data = await cyberRequest("/api/cyber/recon", {method:"POST", body:JSON.stringify({urls:urls, max_requests:5})});
+        await loadCyberFindings();
+        alert("Recon complete. " + data.findings.length + " candidate finding(s) created.");
+    } catch (error) { alert("Recon failed: " + error.message); }
+}
+
 async function loadCyberFindings() {
     const box = document.getElementById("cyberFindings");
     if (!box) return;
