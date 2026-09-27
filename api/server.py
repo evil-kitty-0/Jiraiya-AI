@@ -381,6 +381,10 @@ class JiraiyaHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
 
+        data = self._read_json()
+        if self._cyber_post(self.path, data):
+            return
+
         # ----------------------------------------------------
         # CREATE SESSION
         # ----------------------------------------------------
