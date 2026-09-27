@@ -421,8 +421,6 @@ class JiraiyaHandler(BaseHTTPRequestHandler):
 
                 return
 
-            data = self._read_json()
-
             title = data.get(
                 "title",
                 "New Chat"
