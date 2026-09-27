@@ -9,6 +9,12 @@ const newChatBtn = document.getElementById("newChatBtn");
 const chatHistory = document.getElementById("chatHistory");
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.querySelector(".sidebar");
+const cyberPanel = document.getElementById("cyberPanel");
+const cyberAuthModal = document.getElementById("cyberAuthModal");
+const cyberModalTitle = document.getElementById("cyberModalTitle");
+const cyberModalTarget = document.getElementById("cyberModalTarget");
+const cyberModalAction = document.getElementById("cyberModalAction");
+let pendingCyberFinding = null;
 
 let messages = [];
 let currentSessionId = null;
@@ -54,6 +60,96 @@ function addMessage(role, text) {
     return textElement;
 }
 
+
+/* ============================================================
+   CYBER UI
+   ============================================================ */
+
+async function cyberRequest(path, options) {
+    options = options || {};
+    options.headers = Object.assign({"Content-Type":"application/json"}, options.headers || {});
+    const response = await fetch(API_BASE + path, options);
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.error || "Cyber API request failed");
+    return data;
+}
+
+function toggleCyberPanel(open) {
+    if (!cyberPanel) return;
+    cyberPanel.classList.toggle("open", open !== false);
+    if (open !== false) loadCyberFindings();
+}
+
+async function saveCyberScope() {
+    const program = document.getElementById("cyberProgram").value.trim();
+    const hosts = document.getElementById("cyberHosts").value.split(",").map(function(x){return x.trim();}).filter(Boolean);
+    const paths = document.getElementById("cyberPaths").value.split(",").map(function(x){return x.trim();}).filter(Boolean);
+    const status = document.getElementById("cyberScopeStatus");
+    try {
+        const data = await cyberRequest("/api/cyber/scope", {method:"POST", body:JSON.stringify({program:program, allowed_hosts:hosts, allowed_paths:paths.length ? paths : ["/"]})});
+        status.textContent = "Scope saved: " + data.scope.allowed_hosts.join(", ");
+        await loadCyberFindings();
+    } catch (error) { status.textContent = "❌ " + error.message; }
+}
+
+async function loadCyberFindings() {
+    const box = document.getElementById("cyberFindings");
+    if (!box) return;
+    try {
+        const data = await cyberRequest("/api/cyber/findings");
+        box.innerHTML = "";
+        if (!data.findings.length) {
+            box.innerHTML = '<div class="cyber-status-text">No findings yet. Ask Jiraiya-Cyber to analyze an authorized target.</div>';
+            return;
+        }
+        data.findings.forEach(renderCyberFinding);
+    } catch (error) { box.textContent = "❌ " + error.message; }
+}
+
+function renderCyberFinding(finding) {
+    const box = document.getElementById("cyberFindings");
+    const card = document.createElement("div");
+    card.className = "cyber-finding";
+    const title = document.createElement("div");
+    title.className = "cyber-finding-title";
+    title.textContent = finding.title;
+    const meta = document.createElement("div");
+    meta.className = "cyber-finding-meta";
+    meta.textContent = finding.vulnerability_type + " · " + (Number(finding.confidence)*100).toFixed(0) + "% confidence\\n" + finding.target + "\\nStatus: " + finding.status;
+    const actions = document.createElement("div");
+    actions.className = "cyber-finding-actions";
+    if (finding.status === "NEEDS_VERIFICATION" || finding.status === "VERIFIED") {
+        const btn = document.createElement("button");
+        btn.className = "cyber-approve";
+        btn.textContent = "Request PoC authorization";
+        btn.onclick = function(){ openCyberAuthorization(finding); };
+        actions.appendChild(btn);
+    }
+    card.appendChild(title); card.appendChild(meta); card.appendChild(actions); box.appendChild(card);
+}
+
+async function openCyberAuthorization(finding) {
+    pendingCyberFinding = finding;
+    try {
+        const data = await cyberRequest("/api/cyber/finding/" + encodeURIComponent(finding.id) + "/authorization", {method:"POST", body:JSON.stringify({action:"controlled_non_destructive_poc", max_attempts:1, expires_in_seconds:300})});
+        pendingCyberFinding.authorization = data.authorization;
+        cyberModalTitle.textContent = finding.title;
+        cyberModalTarget.textContent = finding.target;
+        cyberModalAction.textContent = data.authorization.action;
+        cyberAuthModal.classList.add("open");
+    } catch (error) { alert("Authorization request failed: " + error.message); }
+}
+
+async function approveCyberAuthorization() {
+    if (!pendingCyberFinding || !pendingCyberFinding.authorization) return;
+    try {
+        await cyberRequest("/api/cyber/authorization/" + encodeURIComponent(pendingCyberFinding.authorization.id) + "/approve", {method:"POST", body:"{}"});
+        cyberAuthModal.classList.remove("open");
+        alert("Authorization approved. Any future PoC executor must consume this exact authorization before execution.");
+    } catch (error) { alert("Approval failed: " + error.message); }
+}
+
+function closeCyberAuthorization() { pendingCyberFinding = null; cyberAuthModal.classList.remove("open"); }
 
 /* ============================================================
    SESSION API
@@ -744,7 +840,7 @@ menuBtn.addEventListener(
 );
 
 
-/* ============================================================
+document.getElementById("cyberScopeBtn")?.addEventListener("click", saveCyberScope);\ndocument.getElementById("cyberRefreshBtn")?.addEventListener("click", loadCyberFindings);\ndocument.getElementById("cyberCloseBtn")?.addEventListener("click", function(){toggleCyberPanel(false);});\ndocument.getElementById("cyberModalCancel")?.addEventListener("click", closeCyberAuthorization);\ndocument.getElementById("cyberModalApprove")?.addEventListener("click", approveCyberAuthorization);\ndocument.getElementById("cyberToggleBtn")?.addEventListener("click", function(){toggleCyberPanel(true);});\n\n/* ============================================================
    START
    ============================================================ */
 
