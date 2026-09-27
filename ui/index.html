@@ -54,6 +54,32 @@
                 <button class="settings-btn" title="Settings">⚙</button>
             </header>
 
+            <!-- Cyber Security Panel -->
+            <section class="cyber-panel" id="cyberPanel" aria-label="Jiraiya Cyber">
+                <div class="cyber-panel-header">
+                    <div>
+                        <strong>🛡️ JIRAIYA CYBER</strong>
+                        <span>Authorization-first security testing</span>
+                    </div>
+                    <button id="cyberCloseBtn" class="cyber-close" title="Close">×</button>
+                </div>
+
+                <div class="cyber-scope-card">
+                    <h3>Authorized scope</h3>
+                    <input id="cyberProgram" placeholder="Program name">
+                    <input id="cyberHosts" placeholder="Allowed hosts (comma separated)">
+                    <input id="cyberPaths" placeholder="Allowed paths, e.g. /api/*,/app/*">
+                    <button id="cyberScopeBtn" class="cyber-primary">Save scope</button>
+                    <div id="cyberScopeStatus" class="cyber-status-text">No scope configured.</div>
+                </div>
+
+                <div class="cyber-findings-head">
+                    <h3>Findings</h3>
+                    <button id="cyberRefreshBtn" class="cyber-secondary">Refresh</button>
+                </div>
+                <div id="cyberFindings" class="cyber-findings"></div>
+            </section>
+
             <!-- Chat -->
             <section class="chat-area" id="chatArea">
 
