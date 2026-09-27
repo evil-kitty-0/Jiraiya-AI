@@ -179,6 +179,9 @@ class JiraiyaHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
 
+        if self._cyber_get(self.path):
+            return
+
         # ----------------------------------------------------
         # HEALTH
         # ----------------------------------------------------
