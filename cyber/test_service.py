@@ -1,5 +1,6 @@
 """Tests for the Cyber runtime coordinator and explicit approval gate."""
 import unittest
+from unittest.mock import patch
 
 from cyber.service import CyberService
 from cyber.authorization import AuthorizationError
@@ -31,8 +32,20 @@ class CyberServiceTests(unittest.TestCase):
         auth = self.service.request_authorization(self.finding["id"])
         approved = self.service.authorize(auth["id"])
         self.assertTrue(approved.as_dict()["active"])
-        consumed = self.service.consume_authorization(auth["id"], self.finding["id"], "controlled_non_destructive_poc")
+        fake_result = {
+            "finding_id": self.finding["id"],
+            "target": "https://example.com/app/test",
+            "action": "controlled_non_destructive_poc",
+            "status": 200,
+            "headers": {},
+            "confirmed_signals": ["demo signal"],
+            "error": None,
+            "timestamp": 0.0,
+        }
+        with patch("cyber.service.execute_authorized_get", return_value=fake_result):
+            consumed = self.service.consume_authorization(auth["id"], self.finding["id"], "controlled_non_destructive_poc")
         self.assertTrue(consumed["authorized"])
+        self.assertEqual(consumed["finding"]["status"], "verified")
 
 
 if __name__ == "__main__":
