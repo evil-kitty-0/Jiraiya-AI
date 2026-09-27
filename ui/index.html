@@ -139,6 +139,20 @@
 
     </div>
 
+    <div class="cyber-modal" id="cyberAuthModal" role="dialog" aria-modal="true">
+        <div class="cyber-modal-card">
+            <h2>🔐 Authorize controlled PoC</h2>
+            <p><strong>Finding:</strong> <span id="cyberModalTitle"></span></p>
+            <p><strong>Target:</strong> <span id="cyberModalTarget"></span></p>
+            <p><strong>Action:</strong> <span id="cyberModalAction"></span></p>
+            <p>This approval is scoped to this exact finding, target and action. It expires automatically and is single-use by default.</p>
+            <div class="cyber-modal-actions">
+                <button id="cyberModalCancel" class="cyber-cancel">Cancel</button>
+                <button id="cyberModalApprove" class="cyber-approve">AUTHORIZE</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 
 </body>
