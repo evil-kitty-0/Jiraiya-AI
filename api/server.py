@@ -21,6 +21,13 @@ sys.path.insert(0, str(BASE_DIR))
 
 import agent
 
+try:
+    from cyber.service import service as cyber_service
+    CYBER_SERVICE_ERROR = None
+except Exception as exc:
+    cyber_service = None
+    CYBER_SERVICE_ERROR = str(exc)
+
 
 # ============================================================
 # SESSION CONTEXT
@@ -313,6 +320,64 @@ class JiraiyaHandler(BaseHTTPRequestHandler):
     # ========================================================
     # POST
     # ========================================================
+
+    def _cyber_error(self, exc):
+        status = 400
+        if isinstance(exc, KeyError):
+            status = 404
+        self._send_json({"ok": False, "error": str(exc)}, status)
+
+    def _cyber_get(self, path):
+        if cyber_service is None:
+            self._send_json({"ok": False, "error": CYBER_SERVICE_ERROR or "Cyber service unavailable"}, 500)
+            return True
+        if path == "/api/cyber/findings":
+            self._send_json({"ok": True, "findings": cyber_service.list_findings()})
+            return True
+        if path.startswith("/api/cyber/authorization/"):
+            auth_id = path.rsplit("/", 1)[-1]
+            record = cyber_service.authorization.get(auth_id)
+            if record is None:
+                self._send_json({"ok": False, "error": "authorization not found"}, 404)
+            else:
+                self._send_json({"ok": True, "authorization": record})
+            return True
+        return False
+
+    def _cyber_post(self, path, data):
+        if cyber_service is None:
+            self._send_json({"ok": False, "error": CYBER_SERVICE_ERROR or "Cyber service unavailable"}, 500)
+            return True
+        try:
+            if path == "/api/cyber/scope":
+                self._send_json({"ok": True, "scope": cyber_service.set_scope(data)})
+                return True
+            if path == "/api/cyber/finding":
+                self._send_json({"ok": True, "finding": cyber_service.create_finding(data)})
+                return True
+            if path.startswith("/api/cyber/finding/") and path.endswith("/verification"):
+                finding_id = path.split("/api/cyber/finding/", 1)[1].rsplit("/verification", 1)[0]
+                self._send_json({"ok": True, "plan": cyber_service.verification_plan(finding_id)})
+                return True
+            if path.startswith("/api/cyber/finding/") and path.endswith("/authorization"):
+                finding_id = path.split("/api/cyber/finding/", 1)[1].rsplit("/authorization", 1)[0]
+                self._send_json({"ok": True, "authorization": cyber_service.request_authorization(
+                    finding_id,
+                    str(data.get("action", "controlled_non_destructive_poc")),
+                    int(data.get("max_attempts", 1)),
+                    int(data.get("expires_in_seconds", 300)),
+                )})
+                return True
+            if path.startswith("/api/cyber/authorization/") and path.endswith("/consume"):
+                auth_id = path.split("/api/cyber/authorization/", 1)[1].rsplit("/consume", 1)[0]
+                self._send_json({"ok": True, **cyber_service.consume_authorization(
+                    auth_id, str(data.get("finding_id", "")), str(data.get("action", "controlled_non_destructive_poc"))
+                )})
+                return True
+        except Exception as exc:
+            self._cyber_error(exc)
+            return True
+        return False
 
     def do_POST(self):
 
